@@ -1,0 +1,39 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+#prim算法有两种，一种是懒惰一种是即使方法就是处理处理无效边的手段不同
+import Queue1
+import MinPQ
+class LazyPrimMST(object):
+    def __init__(self,G):
+        self.mst = Queue1() #存放mst的边的，是边的Edge对象
+        self.marked = []
+        self.pq = MinPQ() #加入候选的边选出每次将新的顶点的仅有一个顶点在
+        #树中的边添加到最小优先队列
+        self.weight = 0.0 #计算整个树的最小权重
+        for v in range(G.V()):
+            if not self.marked[v]:
+                self.prim(G,v)
+    def prim(self,G,s):  # 真正的prim算法
+        self.scan(G,s)
+        while not self.pq.isEmpty():
+            #这个循环条件不好最好是用mst的变数确定while not self.mst.size==v-1
+            e = self.pq.delMin()
+            v = e.either
+            w = e.other(v)
+            if self.marked[v] and self.marked[w]: # 判断无效边
+                continue
+            self.mst.enqueue(e) #将权重最最小的边添加到mst中
+            self.weight += e.weight()
+            if not self.marked[v]:
+                self.scan(G,v)
+            if not self.marked[w]:
+                self.scan(G,w)
+    def scan(self,G,v):
+        assert not self.marked[v]#v还没有添加到树中
+        self.marked[v] = True
+        for e in G.adj(v): #v的所有邻边
+            if not self.marked[e.other(v)]:
+                self.pq.insert(e) # 将新的顶点的邻边中满足要求的边添加到
+                # 最小优先队列中
+    def weight(self):
+        return self.weight
